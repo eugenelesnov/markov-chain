@@ -1,15 +1,18 @@
+/**
+ * @author Eugene Lesnov
+ */
+
 public class MarkovChainTest {
 
-    private static final int WORDS_PER_STATE = 4;
-
     public static void main(String[] args) {
-        int sentenceLength = 40;
+        int sentenceLength = 30;
+        int wordsPerState = 1;
 
         String[] normalizedText = TestUtil.TEXT_EXAMPLE
                 .replaceAll("\n", " ")
                 .split(" ");
 
-        MarkovChain markovChain = new MarkovChain(normalizedText, WORDS_PER_STATE);
+        MarkovChain markovChain = new MarkovChain(normalizedText, wordsPerState);
         String result = markovChain.compose(sentenceLength);
         System.out.println(result);
     }
