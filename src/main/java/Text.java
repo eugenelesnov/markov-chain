@@ -13,7 +13,7 @@ import java.util.stream.Stream;
  */
 
 @Data
-public class TextFile {
+public class Text {
 
     private String[] words;
 

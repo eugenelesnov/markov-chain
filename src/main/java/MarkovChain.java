@@ -20,7 +20,7 @@ public final class MarkovChain {
         this.wordNumber = checkPositive(wordNumber);
 
         if (words.length < wordNumber) {
-            throw new IllegalArgumentException("number of words < k");
+            throw new IllegalArgumentException("Number of words < k");
         }
 
         this.random = Objects.requireNonNull(random, "The random is null.");
@@ -33,8 +33,7 @@ public final class MarkovChain {
 
     public String compose(int numberOfWords) {
         checkRequestedNumberOfWords(numberOfWords);
-        List<String> startState =
-                vocabulary.get(random.nextInt(vocabulary.size()));
+        List<String> startState = vocabulary.get(random.nextInt(vocabulary.size()));
 
         String[] outputWords = new String[numberOfWords];
         numberOfWords -= wordNumber;
@@ -51,8 +50,7 @@ public final class MarkovChain {
             startState = nextState;
         }
 
-
-        return String.join(" ", outputWords);
+        return prepareResultText(outputWords);
     }
 
     private static <T> T lastOf(List<T> list) {
@@ -77,7 +75,7 @@ public final class MarkovChain {
             coin -= entry.getValue();
         }
 
-        throw new IllegalStateException("Should not get here");
+        throw new IllegalStateException("Illegal transition reached");
     }
 
     private void build() {
@@ -98,11 +96,9 @@ public final class MarkovChain {
 
             Map<List<String>, Integer> localMap = map.computeIfAbsent(startSentence, k -> new HashMap<>());
 
-            localMap.put(nextSentence,
-                    localMap.getOrDefault(nextSentence, 0) + 1);
+            localMap.put(nextSentence, localMap.getOrDefault(nextSentence, 0) + 1);
 
-            totalCountMap.put(startSentence,
-                    totalCountMap.getOrDefault(startSentence, 0) + 1);
+            totalCountMap.put(startSentence, totalCountMap.getOrDefault(startSentence, 0) + 1);
         }
 
         vocabulary.addAll(filter);
@@ -112,15 +108,46 @@ public final class MarkovChain {
         if (k < 1) {
             throw new IllegalArgumentException("k < 1");
         }
-
         return k;
     }
 
     private void checkRequestedNumberOfWords(int numberOfWords) {
         if (numberOfWords < wordNumber) {
             throw new IllegalArgumentException(
-                    "The minimum number of words for composition should be " +
-                            wordNumber + ". Received " + numberOfWords);
+                    "The minimum number of words for composition should be " + wordNumber
+                            + ". Received " + numberOfWords);
         }
+    }
+
+    private String capitalizeFirstLettersInSentence(String sentence) {
+        int pos = 0;
+        boolean capitalize = true;
+
+        StringBuilder sb = new StringBuilder(sentence);
+        while (pos < sb.length()) {
+            if (sb.charAt(pos) == '.') {
+                capitalize = true;
+            } else if (capitalize && !Character.isWhitespace(sb.charAt(pos))) {
+                sb.setCharAt(pos, Character.toUpperCase(sb.charAt(pos)));
+                capitalize = false;
+            }
+            pos++;
+        }
+
+        String result = sb.toString();
+        return result.substring(0, 1).toUpperCase() + result.substring(1);
+    }
+
+    private String prepareResultText(String[] outputWords) {
+        // join words to sentence with whitespace as delimiter
+        String result = String.join(" ", outputWords);
+
+        result = capitalizeFirstLettersInSentence(result);
+
+        // and let's make last word really last.
+        if (!result.endsWith(".")) {
+            result = result.concat(".");
+        }
+        return result;
     }
 }

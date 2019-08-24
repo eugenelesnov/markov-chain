@@ -7,17 +7,28 @@ public class Main {
     private static final int WORDS_PER_STATE = 3;
 
     public static void main(String[] args) {
-        String pathToFile = args[0];
-        int sentenceLength = Integer.parseInt(args[1]);
+        String pathToFile = "";
+        int sentenceLength = 0;
 
+        try {
+            pathToFile = args[0];
+            sentenceLength = Integer.parseInt(args[1]);
+        } catch (Exception ex) {
+            ex.printStackTrace();
+        }
 
-        TextFile textFile = new TextFile();
-        textFile.initText(pathToFile);
+        if (!pathToFile.isEmpty() && sentenceLength > 0) {
+            Text text = new Text();
+            text.initText(pathToFile);
 
-        String[] normalizedText = textFile.getWords();
+            String[] normalizedText = text.getWords();
 
-        MarkovChain markovChain = new MarkovChain(normalizedText, WORDS_PER_STATE);
-        String result = markovChain.compose(sentenceLength);
-        textFile.writeToFile(result);
+            MarkovChain markovChain = new MarkovChain(normalizedText, WORDS_PER_STATE);
+            String result = markovChain.compose(sentenceLength);
+            text.writeToFile(result);
+        } else {
+            throw new IllegalArgumentException("Wrong arguments: pathToFile = " + pathToFile
+                    + " sentenceLength: " + sentenceLength);
+        }
     }
 }
